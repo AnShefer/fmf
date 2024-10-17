@@ -9,21 +9,23 @@ export default function TagVideoRecordsPage() {
   const [searchParams] = useSearchParams();
   const token = searchParams?.get('token');
   const [loading, setLoading] = useState(false);
-  const [videoData, setVideoData] = useState(null);
+  const [videoData, setVideoData] = useState('');
 
   useEffect(() => {
     const fetchData = async () => {
-      console.debug(`Fetching data for video ${token}`);
       setLoading(true);
+      const payload = {
+        videoToken: token,
+      };
       try {
-        const response = await httpRequest.get(`${GET_PUBLIC_TAG_URL}`, {
+        const response = await httpRequest.post(`${GET_PUBLIC_TAG_URL}`, payload, {
           headers: {
             Authorization: token,
           },
         });
         if (response?.status === 200 || response?.status === 201) {
-          setVideoData(response.data[0]);
-          toast.success(response?.data?.message);
+          const videoUrl = response.data[0].file;
+          setVideoData(videoUrl);
         }
       } catch (error) {
         console.error('Error fetching video data:', error);
@@ -33,10 +35,28 @@ export default function TagVideoRecordsPage() {
       }
     };
 
-    fetchData();
+    if (token) {
+      fetchData();
+    }
+
     return () => {};
   }, [token]);
+
+  useEffect(() => {
+    if (videoData) {
+      toast.success('Video data loaded successfully');
+    }
+  }, [videoData]);
+
   return (
-     <VideoPlayer src={videoData?.file}/>
+    <div>
+      {loading ? (
+        <p>Loading...</p>
+      ) : videoData ? (
+        <VideoPlayer src={videoData} />
+      ) : (
+        <p>No video data available</p>
+      )}
+    </div>
   );
 }

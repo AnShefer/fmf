@@ -31,6 +31,8 @@ const BuyTagDialog = ({ openDialog, handleCloseDialog, getSubusers = () => {} })
   const [statecode, setStatecode] = useState('');
   const [postcode, setPostcode] = useState('');
   const [phone, setPhone] = useState('');
+  const [color, setColor] = useState('');
+  const [selectedBox, setSelectedBox] = useState(0);
   const [passError, setpassError] = useState(false);
   const handleSubmit = async () => {
     if (!firstName) {
@@ -47,7 +49,7 @@ const BuyTagDialog = ({ openDialog, handleCloseDialog, getSubusers = () => {} })
     }
     if (!statecode) {
       return toast.error('Please enter state');
-    }  
+    }
     if (!postcode) {
       return toast.error('Please enter postcode');
     }
@@ -66,6 +68,7 @@ const BuyTagDialog = ({ openDialog, handleCloseDialog, getSubusers = () => {} })
       firstName,
       lastName,
       phone,
+      color,
     };
     try {
       const response = await httpRequest.post(BUY_TAG, payload, {
@@ -94,6 +97,8 @@ const BuyTagDialog = ({ openDialog, handleCloseDialog, getSubusers = () => {} })
     setStatecode('');
     setPostcode('');
     setPhone('');
+    setColor('');
+    setSelectedBox(0);
   };
 
   return (
@@ -147,7 +152,6 @@ const BuyTagDialog = ({ openDialog, handleCloseDialog, getSubusers = () => {} })
         </Box>
       </DialogTitle>
       <DialogContent>
-        
         <Grid sx={{ px: { sm: '50px' } }} container spacing={3}>
           <Grid item xs={12} sm={6}>
             <Box>
@@ -208,7 +212,7 @@ const BuyTagDialog = ({ openDialog, handleCloseDialog, getSubusers = () => {} })
                 InputProps={{
                   endAdornment: (
                     <InputAdornment position="end">
-                     <svg
+                      <svg
                         xmlns="http://www.w3.org/2000/svg"
                         width="13"
                         height="14"
@@ -230,7 +234,9 @@ const BuyTagDialog = ({ openDialog, handleCloseDialog, getSubusers = () => {} })
           </Grid>
           <Grid item xs={12} sm={6}>
             <Box pb={2}>
-              <Typography sx={{ mb: 1, fontSize: '16px', fontWeight: 400 }}>Street address</Typography>
+              <Typography sx={{ mb: 1, fontSize: '16px', fontWeight: 400 }}>
+                Street address
+              </Typography>
               <TextField
                 type="text"
                 fullWidth
@@ -255,7 +261,7 @@ const BuyTagDialog = ({ openDialog, handleCloseDialog, getSubusers = () => {} })
           <Grid item xs={12} sm={6}>
             <Box pb={2}>
               <Typography sx={{ mb: 1, fontSize: '16px', fontWeight: 400 }}>
-              Apartment, suite, unit, etc. (optional) 
+                Apartment, suite, unit, etc. (optional)
               </Typography>
               <TextField
                 type="text"
@@ -301,9 +307,7 @@ const BuyTagDialog = ({ openDialog, handleCloseDialog, getSubusers = () => {} })
           </Grid>
           <Grid item xs={12} sm={6}>
             <Box pb={2}>
-              <Typography sx={{ mb: 1, fontSize: '16px', fontWeight: 400 }}>
-              State
-              </Typography>
+              <Typography sx={{ mb: 1, fontSize: '16px', fontWeight: 400 }}>State</Typography>
               <TextField
                 type="text"
                 name="statecode"
@@ -322,7 +326,7 @@ const BuyTagDialog = ({ openDialog, handleCloseDialog, getSubusers = () => {} })
               />
             </Box>
           </Grid>
-          
+
           <Grid item xs={12} sm={6}>
             <Box pb={2}>
               <Typography sx={{ mb: 1, fontSize: '16px', fontWeight: 400 }}>Postcode</Typography>
@@ -349,9 +353,7 @@ const BuyTagDialog = ({ openDialog, handleCloseDialog, getSubusers = () => {} })
           </Grid>
           <Grid item xs={12} sm={6}>
             <Box pb={2}>
-              <Typography sx={{ mb: 1, fontSize: '16px', fontWeight: 400 }}>
-              Phone
-              </Typography>
+              <Typography sx={{ mb: 1, fontSize: '16px', fontWeight: 400 }}>Phone</Typography>
               <TextField
                 type="tel"
                 name="phone"
@@ -368,6 +370,56 @@ const BuyTagDialog = ({ openDialog, handleCloseDialog, getSubusers = () => {} })
                   },
                 }}
               />
+            </Box>
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <Box pb={2}>
+              <Typography sx={{ mb: 1, fontSize: '16px', fontWeight: 400 }}>Tag Colour</Typography>
+              <Grid
+                container
+                item
+                xs={12}
+                sm={6}
+                direction="row"
+                spacing={1} // This creates a 8px gap (MUI's spacing unit is typically 8px)
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                }}
+              >
+                {['#FFD700', '#1236ca', '#000000'].map((currentColor, index) => (
+                  <Grid item key={index}>
+                    <Box
+                      onClick={(e) => {
+                        const computedStyle = window.getComputedStyle(e.currentTarget);
+                        setColor(computedStyle.backgroundColor);
+                        setSelectedBox(index);
+                      }}
+                      sx={{
+                        width: '30px',
+                        height: '30px',
+                        borderRadius: '6px',
+                        backgroundColor: currentColor,
+                        transition: 'all 0.1s ease-in-out',
+                        cursor: 'pointer',
+                        ...(selectedBox === index
+                          ? {
+                              boxShadow:
+                                'inset 0 0 0 1px rgba(255, 255, 255, 0.5), inset 0 0 0 2px rgba(0, 0, 0, 0.5)',
+                              border: '2px solid white',
+                            }
+                          : {
+                              boxShadow: '0 2px 5px rgba(0, 0, 0, 0.2)',
+                              '&:hover': {
+                                boxShadow: '0 4px 10px rgba(0, 0, 0, 0.3)',
+                              },
+                            }),
+                        marginRight: index < 2 ? '6px' : 0, // Add right margin except for the last box
+                      }}
+                    />
+                  </Grid>
+                ))}
+              </Grid>
             </Box>
           </Grid>
         </Grid>

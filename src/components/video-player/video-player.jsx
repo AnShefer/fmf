@@ -1,9 +1,17 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import { Box } from '@mui/material';
 
 const VideoPlayer = ({ src, initialMuted = true, autoPlay = true, controls = true }) => {
   const [isMuted] = useState(initialMuted);
+  const videoRef = useRef(null);
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (video) {
+      video.load(); 
+    }
+  }, [src]);
   return (
     <Box
       sx={{
